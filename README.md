@@ -6,6 +6,7 @@ Live pages: **https://mindfreez.github.io/ai-diagrams/**
 | Diagram | Page | Obsidian |
 |---|---|---|
 | Local AI at a glance | [diagrams/local-ai-overview](https://mindfreez.github.io/ai-diagrams/diagrams/local-ai-overview/) | `diagrams/local-ai-overview/overview.canvas` |
+| Which rules each assistant reads | [diagrams/assistant-rules](https://mindfreez.github.io/ai-diagrams/diagrams/assistant-rules/) | `diagrams/assistant-rules/assistant-rules.canvas` |
 
 ## This repo is public
 - **Only public-safe content.** No chats or chat history, personal or client details, addresses, account names beyond the GitHub username, keys/tokens, or private file contents.
