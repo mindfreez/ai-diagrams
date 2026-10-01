@@ -1,22 +1,22 @@
 {
  "nodes": [
   {
-   "id": "map",
-   "type": "file",
-   "file": "diagrams/assistant-rules/assistant-rules.png",
-   "x": 0,
-   "y": 0,
-   "width": 1400,
-   "height": 1472
-  },
-  {
    "id": "live",
    "type": "link",
    "url": "https://mindfreez.github.io/ai-diagrams/diagrams/assistant-rules/",
    "x": 0,
-   "y": 1512,
+   "y": 0,
    "width": 1400,
-   "height": 80
+   "height": 1488
+  },
+  {
+   "id": "offline",
+   "type": "text",
+   "x": 0,
+   "y": 1528,
+   "width": 1400,
+   "height": 60,
+   "text": "Offline copy: [[diagrams/assistant-rules/assistant-rules.png]] \u00b7 live page: https://mindfreez.github.io/ai-diagrams/diagrams/assistant-rules/"
   }
  ],
  "edges": []
