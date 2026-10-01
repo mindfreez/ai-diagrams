@@ -1,7 +1,7 @@
 """Builds the "Which rules each assistant reads" map in both places:
   - GitHub Pages: diagrams/assistant-rules/index.html (orb-flow template CSS, phone first)
-  - Obsidian:     Shared\\Maps\\Assistant rules.canvas (native canvas: coloured cards + arrows), copied into this repo too
-Edit the NODES / EDGES below, run this script, then commit and push."""
+  - Obsidian:     Shared\\Maps\\Assistant rules.canvas + .png (a 2x snapshot of the page), copied into this repo too
+Edit the content lists below, run this script, then commit and push."""
 import json, pathlib, re, shutil, subprocess, sys
 REPO = pathlib.Path(__file__).resolve().parents[1]
 DEST = REPO / "diagrams" / "assistant-rules"
@@ -27,8 +27,6 @@ OUTS = [
     ("cx-usage", "Codex usage line", "end of each reply", ["Format: Codex 5h % · Week % · reset times", "From get_usage_limits"]),
     ("worklog", "Work logs", r"Shared\Worklog", ["Each assistant logs what it did", "Read the other's newest entries first"]),
 ]
-EDGES = [("shared", "claude"), ("claudemd", "claude"), ("agents", "claude"), ("shared", "codex"), ("codexmd", "codex"), ("agents", "codex"),
-         ("claude", "cl-usage"), ("codex", "cx-usage"), ("claude", "worklog"), ("codex", "worklog")]
 FIXED = ("Fixed 30 Sep 2026", "Claude was following the Codex footer rule in the workspace AGENTS.md. "
          "That section now says Codex only, and Claude shows only its own usage. "
          "A cleaner option: move the Codex footer into Codex's own global file.")
@@ -73,18 +71,7 @@ page = ('<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n'
 DEST.mkdir(parents=True, exist_ok=True)
 (DEST / "index.html").write_text(page, encoding="utf-8")
 
-# ---- Obsidian canvas: columns of cards, colour = role (6 purple files, 4 green assistants, 2 orange outputs) ----
-nodes, pos = [], {}
-def card(id_, x, y, text, color, w=380, h=190):
-    nodes.append({"id": id_, "type": "text", "x": x, "y": y, "width": w, "height": h, "color": color, "text": text}); pos[id_] = (x, y)
-nodes.append({"id": "title", "type": "text", "x": 0, "y": -260, "width": 1500, "height": 160, "text": f"# {TITLE}\n{INTRO}"})
-for i, (id_, n, p, l) in enumerate(FILES): card(id_, 0, i * 240, f"### 📄 {n}\n`{p}`\n" + "\n".join(f"- {x}" for x in l), "6")
-for i, (id_, n, s, l) in enumerate(BOTS): card(id_, 560, 120 + i * 420, f"### 🤖 {n}\n*{s}*\n" + "\n".join(f"- {x}" for x in l), "4", h=250)
-for i, (id_, n, s, l) in enumerate(OUTS): card(id_, 1120, i * 300, f"### {'📒' if id_ == 'worklog' else '📊'} {n}\n*{s}*\n" + "\n".join(f"- {x}" for x in l), "2")
-card("fixed", 560, 1000, f"### ✅ {FIXED[0]}\n{FIXED[1]}", "4", w=940, h=170)
-edges = [{"id": f"e{k}", "fromNode": a, "fromSide": "right", "toNode": b, "toSide": "left", "label": "read by" if b in ("claude", "codex") else "shows"} for k, (a, b) in enumerate(EDGES)]
-edges[2]["color"] = edges[5]["color"] = "1"   # the shared AGENTS.md is where the mix-up came from
-data = json.dumps({"nodes": nodes, "edges": edges}, indent=1, ensure_ascii=False)
-CANVAS.write_text(data, encoding="utf-8"); (DEST / "assistant-rules.canvas").write_text(data, encoding="utf-8")
-print("wrote", DEST / "index.html", "and", CANVAS)
+# ---- Obsidian: 2x desktop snapshot on a canvas (shared tool) ----
+subprocess.run([sys.executable, str(REPO / "tools" / "snapshot_obsidian.py"), "assistant-rules", "Assistant rules"], check=True)
+print("wrote", DEST / "index.html")
 sys.exit(subprocess.run([sys.executable, str(REPO / "tools" / "check_public.py")]).returncode)

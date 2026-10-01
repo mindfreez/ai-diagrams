@@ -1,197 +1,23 @@
 {
  "nodes": [
   {
-   "id": "title",
-   "type": "text",
-   "x": 0,
-   "y": -260,
-   "width": 1500,
-   "height": 160,
-   "text": "# Which rules each assistant reads\nClaude and ChatGPT/Codex share one master rules file, and each also reads its own settings. A Codex-only rule in the workspace AGENTS.md was also being read by Claude, so Claude showed a Codex usage line. That section is now marked Codex only."
-  },
-  {
-   "id": "shared",
-   "type": "text",
+   "id": "map",
+   "type": "file",
+   "file": "diagrams/assistant-rules/assistant-rules.png",
    "x": 0,
    "y": 0,
-   "width": 380,
-   "height": 190,
-   "color": "6",
-   "text": "### 📄 Shared rules\n`Shared\\ASSISTANT-RULES.md`\n- Master copy for both assistants\n- Usage line: Claude uses get_usage, ChatGPT its own readout"
+   "width": 1400,
+   "height": 1472
   },
   {
-   "id": "claudemd",
-   "type": "text",
+   "id": "live",
+   "type": "link",
+   "url": "https://mindfreez.github.io/ai-diagrams/diagrams/assistant-rules/",
    "x": 0,
-   "y": 240,
-   "width": 380,
-   "height": 190,
-   "color": "6",
-   "text": "### 📄 Claude global\n`~\\.claude\\CLAUDE.md`\n- Only points at the shared rules"
-  },
-  {
-   "id": "codexmd",
-   "type": "text",
-   "x": 0,
-   "y": 480,
-   "width": 380,
-   "height": 190,
-   "color": "6",
-   "text": "### 📄 Codex global\n`~\\.codex\\AGENTS.md`\n- Points at the shared rules\n- Codex's own working rules"
-  },
-  {
-   "id": "agents",
-   "type": "text",
-   "x": 0,
-   "y": 720,
-   "width": 380,
-   "height": 190,
-   "color": "6",
-   "text": "### 📄 Workspace AGENTS.md\n`C:\\AI Workspace\\AGENTS.md`\n- Read by both when opened in that folder\n- Codex usage footer: now marked Codex only"
-  },
-  {
-   "id": "claude",
-   "type": "text",
-   "x": 560,
-   "y": 120,
-   "width": 380,
-   "height": 250,
-   "color": "4",
-   "text": "### 🤖 Claude\n*Code tab · Opus / Sonnet*\n- Reads: Claude global → Shared rules\n- Reads: workspace AGENTS.md\n- Plus: its own memory folder\n- Skips: the Codex footer section"
-  },
-  {
-   "id": "codex",
-   "type": "text",
-   "x": 560,
-   "y": 540,
-   "width": 380,
-   "height": 250,
-   "color": "4",
-   "text": "### 🤖 ChatGPT / Codex\n*Codex agent*\n- Reads: Codex global → Shared rules\n- Reads: workspace AGENTS.md\n- Uses: the Codex footer section"
-  },
-  {
-   "id": "cl-usage",
-   "type": "text",
-   "x": 1120,
-   "y": 0,
-   "width": 380,
-   "height": 190,
-   "color": "2",
-   "text": "### 📊 Claude usage line\n*end of each reply*\n- Format: Claude 5h % · Week % · reset times\n- From get_usage (also feeds the usage widget)"
-  },
-  {
-   "id": "cx-usage",
-   "type": "text",
-   "x": 1120,
-   "y": 300,
-   "width": 380,
-   "height": 190,
-   "color": "2",
-   "text": "### 📊 Codex usage line\n*end of each reply*\n- Format: Codex 5h % · Week % · reset times\n- From get_usage_limits"
-  },
-  {
-   "id": "worklog",
-   "type": "text",
-   "x": 1120,
-   "y": 600,
-   "width": 380,
-   "height": 190,
-   "color": "2",
-   "text": "### 📒 Work logs\n*Shared\\Worklog*\n- Each assistant logs what it did\n- Read the other's newest entries first"
-  },
-  {
-   "id": "fixed",
-   "type": "text",
-   "x": 560,
-   "y": 1000,
-   "width": 940,
-   "height": 170,
-   "color": "4",
-   "text": "### ✅ Fixed 30 Sep 2026\nClaude was following the Codex footer rule in the workspace AGENTS.md. That section now says Codex only, and Claude shows only its own usage. A cleaner option: move the Codex footer into Codex's own global file."
+   "y": 1512,
+   "width": 1400,
+   "height": 80
   }
  ],
- "edges": [
-  {
-   "id": "e0",
-   "fromNode": "shared",
-   "fromSide": "right",
-   "toNode": "claude",
-   "toSide": "left",
-   "label": "read by"
-  },
-  {
-   "id": "e1",
-   "fromNode": "claudemd",
-   "fromSide": "right",
-   "toNode": "claude",
-   "toSide": "left",
-   "label": "read by"
-  },
-  {
-   "id": "e2",
-   "fromNode": "agents",
-   "fromSide": "right",
-   "toNode": "claude",
-   "toSide": "left",
-   "label": "read by",
-   "color": "1"
-  },
-  {
-   "id": "e3",
-   "fromNode": "shared",
-   "fromSide": "right",
-   "toNode": "codex",
-   "toSide": "left",
-   "label": "read by"
-  },
-  {
-   "id": "e4",
-   "fromNode": "codexmd",
-   "fromSide": "right",
-   "toNode": "codex",
-   "toSide": "left",
-   "label": "read by"
-  },
-  {
-   "id": "e5",
-   "fromNode": "agents",
-   "fromSide": "right",
-   "toNode": "codex",
-   "toSide": "left",
-   "label": "read by",
-   "color": "1"
-  },
-  {
-   "id": "e6",
-   "fromNode": "claude",
-   "fromSide": "right",
-   "toNode": "cl-usage",
-   "toSide": "left",
-   "label": "shows"
-  },
-  {
-   "id": "e7",
-   "fromNode": "codex",
-   "fromSide": "right",
-   "toNode": "cx-usage",
-   "toSide": "left",
-   "label": "shows"
-  },
-  {
-   "id": "e8",
-   "fromNode": "claude",
-   "fromSide": "right",
-   "toNode": "worklog",
-   "toSide": "left",
-   "label": "shows"
-  },
-  {
-   "id": "e9",
-   "fromNode": "codex",
-   "fromSide": "right",
-   "toNode": "worklog",
-   "toSide": "left",
-   "label": "shows"
-  }
- ]
+ "edges": []
 }
