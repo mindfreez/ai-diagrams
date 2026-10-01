@@ -50,7 +50,7 @@ header p { color: var(--muted); margin: 8px 0 0; max-width: 60ch; }
 .orb svg { width: 42%; height: 42%; stroke: #ffffff; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1px 2px #00000066); position: relative; z-index: 1; }
 .you .orb { --c: var(--you); --d: var(--you-deep); --size: 108px; }
 .you .orb.small { --size: 70px; }
-.orbs.asks { margin-top: 26px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.orbs.asks { margin-top: 26px; grid-template-columns: 1fr; }
 .out .orb { --c: var(--out); --d: var(--out-deep); --size: 92px; }
 .orb.meter { --c: var(--meter); --d: var(--meter-deep); }
 .node h3 { margin: 12px 0 0; font: 600 19px/1.2 var(--display); }
@@ -96,11 +96,7 @@ body{margin:0}</style>
       <div class="orbs asks">
         <div class="node"><div class="orb small" style="--delay:-3s"><svg viewBox="0 0 24 24"><path d="M4 5h16v10H9l-5 4z"/><path d="M8 9h8M8 12h5"/></svg></div>
           <h3>Local chat</h3><div class="sub">Open WebUI on the home PC</div>
-          <ul><li><b>No usage</b>local models only</li><li><b>Works offline</b>backup when the internet is down</li></ul></div>
-        <div class="node"><div class="orb small" style="--delay:-1.5s"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 2.5 14.4 0 17M12 3.5c-2.5 2.6-2.5 14.4 0 17"/></svg></div>
-          <h3>Free cloud chats</h3><div class="sub">quick questions, no allowance</div>
-          <ul><li><b>duck.ai · Copilot · Gemini</b>not connected to your files</li></ul></div>
-      </div>
+          <ul><li><b>No usage</b>local models only</li><li><b>Works offline</b>backup when the internet is down</li></ul></div>      </div>
     </div>
 
     <div class="link"><span>asks</span><span class="dots"></span></div>
