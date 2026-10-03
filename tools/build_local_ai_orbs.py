@@ -8,7 +8,7 @@ orbs = {
     "you":    (230, 640, 96, "🤖", "You + assistants", "ask from the laptop or home PC", "violet",
                ["Claude|Opus / Sonnet · Code tab", "ChatGPT|Codex agent", "Scripts|scheduled overnight jobs"]),
     "text":   (760, 330, 64, "📝", "Text", "Ollama · via meter :11435", "green",
-               ["qwen3:8b|5.2 GB · 4.4 tok/s · general", "qwen2.5-coder:7b|4.7 GB · 5 tok/s · code", "qwen2.5-coder:1.5b|1.0 GB · 18 tok/s · quick", "nomic-embed-text|0.3 GB · search by meaning"]),
+               ["qwen3:8b|5.2 GB · 4.4 tok/s · general", "qwen2.5-coder:7b|4.7 GB · 5 tok/s · code", "nemotron-3.5-lightning|25 GB · 5.8 tok/s · best quality (MoE)", "nomic-embed-text|0.3 GB · search by meaning"]),
     "img":    (1200, 330, 64, "🖼️", "Images", "512 px, CPU only", "green",
                ["FastSD CPU|SD-Turbo · OpenVINO · 12 s warm", "stable-diffusion.cpp|SD-Turbo + TAESD · 16 s"]),
     "vid":    (760, 660, 64, "🎬", "Video", "text → short clip", "green",
