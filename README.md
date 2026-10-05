@@ -17,3 +17,9 @@ Live pages: **https://mindfreez.github.io/ai-diagrams/**
 - `diagrams/<name>/index.html`: the animated page (also published on GitHub Pages).
 - `diagrams/<name>/*.canvas`, `*.svg`: Obsidian versions. Open this repo folder as an Obsidian vault ("Obsidian Diagrams").
 - `tools/`: scripts that build the diagrams and run the public check.
+
+## Projects
+
+| Project | Page |
+|---|---|
+| GitHub Heatmap | [projects/github-heatmap](https://mindfreez.github.io/ai-diagrams/projects/github-heatmap/) |

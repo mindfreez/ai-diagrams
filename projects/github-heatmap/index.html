@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GitHub Heatmap</title>
+<style>
+:root{--bg:#0d1117;--fg:#e6edf3;--mut:#8b949e}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:14px system-ui,sans-serif;display:flex;flex-direction:column;height:100vh}
+header{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:10px 16px}
+h1{font-size:16px;margin:0;margin-right:auto}
+button{background:#21262d;color:var(--fg);border:1px solid #30363d;border-radius:6px;padding:5px 12px;cursor:pointer}
+button.on{background:#1f6feb;border-color:#1f6feb}
+#legend{display:flex;align-items:center;gap:6px;color:var(--mut);font-size:12px}
+#bar{width:120px;height:10px;border-radius:5px;background:linear-gradient(90deg,#1b2a4a,#6b2d8c,#d6336c,#ff922b,#ffe066)}
+#map{position:relative;flex:1;margin:0 16px 16px;min-height:300px}
+.t{position:absolute;overflow:hidden;padding:6px 8px;border:1px solid var(--bg);border-radius:4px;color:#fff;text-decoration:none;line-height:1.25;text-shadow:0 1px 2px #0008;transition:filter .1s}
+.t:hover{filter:brightness(1.2);z-index:2;outline:2px solid #fff}
+.t b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t small{opacity:.85;display:block;overflow:hidden;white-space:nowrap}
+#filters{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:0 16px 8px}
+#filters input{background:#161b22;color:var(--fg);border:1px solid #30363d;border-radius:6px;padding:5px 10px;width:200px}
+#filters button{padding:3px 9px;font-size:12px;border-radius:12px}
+#filters span{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+#filters span:before{content:attr(data-l);color:var(--mut);font-size:11px;margin-right:2px}
+#tip{position:fixed;display:none;width:320px;background:#161b22;border:1px solid #30363d;border-radius:8px;overflow:hidden;z-index:9;pointer-events:none;box-shadow:0 8px 24px #000a}
+#tip img{width:100%;display:block;aspect-ratio:2/1;object-fit:cover;background:#0d1117}
+#tiptxt{padding:8px 10px;font-size:12px;line-height:1.4}
+#tiptxt b{font-size:13px}#tiptxt .m{color:var(--mut)}
+#msg{position:absolute;inset:0;display:grid;place-items:center;color:var(--mut)}
+</style></head><body>
+<header>
+<h1>GitHub heatmap — size = stars, color = heat</h1>
+<span id="modes"></span>
+<span id="legend">cooler <i id="bar"></i> hotter</span>
+</header>
+<div id="filters"><button id="en" class="on">English only</button><input id="q" placeholder="Search name/description…"><span id="cats"></span><span id="langs"></span></div>
+<div id="tip"><img id="tipimg" alt=""><div id="tiptxt"></div></div>
+<div id="map"><div id="msg">Loading…</div></div>
+<script>
+const day=n=>new Date(Date.now()-n*864e5).toISOString().slice(0,10);
+const MODES={
+ 'New this week':{q:`created:>${day(7)}`,days:7,heat:'stars per day since creation'},
+ 'New this month':{q:`created:>${day(30)}`,days:30,heat:'stars per day since creation'},
+ 'Active now':{q:`pushed:>${day(2)} stars:>20000`,heat:'stars per day over lifetime'},
+ 'All-time':{q:'stars:>1',heat:'stars per day over lifetime'}
+};
+let mode='New this week',repos=[];
+const $=id=>document.getElementById(id),map=$('map');
+$('modes').innerHTML=Object.keys(MODES).map(m=>`<button data-m="${m}">${m}</button>`).join(' ');
+$('modes').onclick=e=>{if(e.target.dataset.m){mode=e.target.dataset.m;load()}};
+
+async function load(){
+ document.querySelectorAll('#modes button').forEach(b=>b.classList.toggle('on',b.dataset.m===mode));
+ map.innerHTML='<div id="msg">Loading…</div>';
+ const key='gh2:'+mode;let c=null;try{c=JSON.parse(localStorage.getItem(key)||'null')}catch(e){}
+ if(c&&Date.now()-c.t<6e5)repos=c.d;
+ else{
+  try{
+   const r=await fetch(`https://api.github.com/search/repositories?q=${encodeURIComponent(MODES[mode].q)}&sort=stars&order=desc&per_page=60`);
+   if(!r.ok)throw new Error(r.status===403?'GitHub rate limit hit — wait a minute and retry':'HTTP '+r.status);
+   repos=(await r.json()).items.map(i=>({n:i.full_name,s:i.stargazers_count,l:i.language||'—',d:i.description||'',u:i.html_url,c:i.created_at,tp:i.topics||[],o:i.owner.avatar_url}));
+   try{localStorage.setItem(key,JSON.stringify({t:Date.now(),d:repos}))}catch(e){}
+  }catch(e){map.innerHTML=`<div id="msg">${e.message}</div>`;return}
+ }
+ render();
+}
+const CATS={'AI / ML':/\b(ai|llm|gpt|agent|ml|machine-learning|deep-learning|neural|model|diffusion|rag|chatbot|claude|openai|mcp|copilot|inference|transformer)s?\b/,
+'Dev tools':/\b(cli|devtools|developer|compiler|editor|ide|terminal|git|framework|sdk|library|linter|build|debug|testing|api|docker|kubernetes|devops)\b/,
+'Web / UI':/\b(react|vue|svelte|nextjs|frontend|css|ui|web|browser|html|javascript|typescript|tailwind|website)\b/,
+'Security':/\b(security|hacking|pentest|vulnerab|exploit|malware|crypto|privacy|osint|cve|reverse-engineering)\w*/,
+'Games / Media':/\b(game|games|gaming|emulator|minecraft|video|music|audio|media|anime|3d|graphics)\b/,
+'Data / Infra':/\b(database|data|sql|analytics|self-hosted|selfhosted|server|cloud|storage|monitoring|automation|workflow)\b/,
+'Learning / Lists':/\b(awesome|tutorial|course|roadmap|interview|learn|learning|guide|books|resources|list)\b/};
+function cat(r){const t=(r.tp.join(' ')+' '+r.d+' '+r.n).toLowerCase();for(const k in CATS)if(CATS[k].test(t))return k;return 'Other'}
+let en=true;
+const nonEn=r=>{const L=(r.d+' '+r.n).match(/\p{L}/gu)||[];return L.length>0&&L.filter(c=>!/\p{Script=Latin}/u.test(c)).length/L.length>0.2};
+$('en').onclick=()=>{en=!en;$('en').classList.toggle('on',en);render()};
+let fc='All',fl='All',fq='';
+function chips(el,label,vals,cur,set){el.dataset.l=label;el.innerHTML=['All',...vals].map(v=>`<button class="${v===cur?'on':''}" data-v="${v}">${v}</button>`).join('');
+ el.onclick=e=>{if(e.target.dataset.v){set(e.target.dataset.v);render()}}}
+$('q').oninput=e=>{fq=e.target.value.toLowerCase();render()};
+const tip=$('tip');
+map.onmousemove=e=>{const a=e.target.closest('.t');if(!a){tip.style.display='none';return}
+ if(tip.dataset.u!==a.href){tip.dataset.u=a.href;const i=repos.find(r=>r.u===a.href);
+  $('tipimg').src='https://opengraph.githubassets.com/1/'+i.n;$('tipimg').onerror=function(){this.onerror=null;this.src=i.o};
+  $('tiptxt').innerHTML=`<b>${i.n}</b><div class="m">★ ${i.s.toLocaleString()} · ${i.l} · ${cat(i)}</div><div>${i.d}</div>`+(i.tp.length?`<div class="m">${i.tp.slice(0,6).join(' · ')}</div>`:'')}
+ tip.style.display='block';const x=e.clientX+16,y=e.clientY+16;
+ tip.style.left=Math.min(x,innerWidth-340)+'px';tip.style.top=Math.min(y,innerHeight-tip.offsetHeight-10)+'px'};
+map.onmouseleave=()=>tip.style.display='none';
+const ramp=['#1b2a4a','#6b2d8c','#d6336c','#ff922b','#ffe066'];
+function col(t){t=Math.max(0,Math.min(1,t))*(ramp.length-1);const i=Math.min(Math.floor(t),ramp.length-2),f=t-i;
+ const p=h=>[1,3,5].map(k=>parseInt(h.substr(k,2),16)),a=p(ramp[i]),b=p(ramp[i+1]);
+ return 'rgb('+a.map((v,k)=>Math.round(v+(b[k]-v)*f)).join(',')+')'}
+function worst(row,sum,s){return Math.max(s*s*row[0].v/(sum*sum),sum*sum/(s*s*row[row.length-1].v))}
+function squarify(items,x,y,w,h){
+ const out=[];let rest=items.slice();
+ while(rest.length){
+  const s=Math.min(w,h);let row=[rest[0]],sum=rest[0].v,i=1;
+  while(i<rest.length){const n=[...row,rest[i]],ns=sum+rest[i].v;
+   if(worst(n,ns,s)<=worst(row,sum,s)){row=n;sum=ns;i++}else break}
+  rest=rest.slice(row.length);
+  if(w>=h){const rw=sum/h;let yy=y;row.forEach(r=>{const rh=r.v/rw;out.push({...r,x,y:yy,w:rw,h:rh});yy+=rh});x+=rw;w-=rw}
+  else{const rh=sum/w;let xx=x;row.forEach(r=>{const rw=r.v/rh;out.push({...r,x:xx,y,w:rw,h:rh});xx+=rw});y+=rh;h-=rh}
+ }
+ return out}
+const fmt=n=>n>=1e3?(n/1e3).toFixed(n>=1e5?0:1)+'k':n;
+function render(){
+ const all=repos.filter(r=>!en||!nonEn(r)),cats=[...new Set(all.map(cat))].sort(),langs=[...new Set(all.map(r=>r.l))].filter(l=>l!=='—').sort();
+ if(fc!=='All'&&!cats.includes(fc))fc='All';if(fl!=='All'&&!langs.includes(fl))fl='All';
+ chips($('cats'),'Category',cats,fc,v=>fc=v);chips($('langs'),'Language',langs,fl,v=>fl=v);
+ const all0=repos;repos=all.filter(r=>(fc==='All'||cat(r)===fc)&&(fl==='All'||r.l===fl)&&(!fq||(r.n+' '+r.d).toLowerCase().includes(fq)));
+ try{draw()}finally{repos=all0}}
+function draw(){
+ const W=map.clientWidth,H=map.clientHeight,m=MODES[mode];
+ if(!repos.length){map.innerHTML='<div id="msg">No repos match these filters</div>';return}
+ const heat=repos.map(r=>r.s/Math.max(1,m.days||(Date.now()-new Date(r.c))/864e5));
+ const lh=heat.map(h=>Math.log(h+1)),lo=Math.min(...lh),hi=Math.max(...lh);
+ const tot=repos.reduce((a,r)=>a+r.s,0);
+ const items=repos.map((r,i)=>({...r,v:r.s/tot*W*H,t:(lh[i]-lo)/(hi-lo||1),hp:heat[i]})).sort((a,b)=>b.v-a.v);
+ map.innerHTML=squarify(items,0,0,W,H).map(r=>`<a class="t" target="_blank" href="${r.u}" title="${r.n}\n${r.d.replace(/"/g,"'")}\n★ ${r.s.toLocaleString()} · ${Math.round(r.hp).toLocaleString()} stars/day"
+ style="left:${r.x}px;top:${r.y}px;width:${r.w}px;height:${r.h}px;background:${col(r.t)};${r.t>.8?'color:#111;text-shadow:none':''}">
+ <b style="font-size:${Math.max(10,Math.min(20,Math.sqrt(r.w*r.h)/7))}px">${r.n}</b>${r.h>40&&r.w>70?`<small>★ ${fmt(r.s)} · ${r.l}</small>`:''}</a>`).join('');
+ $('bar').title=m.heat;$('legend').firstChild.textContent='cooler ';
+}
+addEventListener('resize',()=>repos.length&&render());
+load();
+</script></body></html>
